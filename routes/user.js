@@ -29,17 +29,11 @@ router.post("/signup", async (req, res) => {
     const hashOfPassword = await bcrypt.hash(password, 10);
 
     // Send verification link to email
-    var sent = await userController.send_ver_link(user_name, email, hashOfPassword, req.protocol, req.get('host'));
-    if (sent==true) {
-      return res
-      .status(200)
-      .json({ success: true, data: "Signup successful" });
-    }
-    else{
+    await userController.create(user_name, email, hashOfPassword);
     return res
-      .status(200)
-      .json({ success: false, data: "cannot send verification email " + sent });
-    }
+    .status(200)
+    .json({ success: true, data: "Signup successful" });
+    
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -229,28 +223,28 @@ router.post("/reset_password", async (req, res) => {
 
 });
 
-/**
- * API Endpoint to verify email address
- */
-router.get("/verify_email", async(req, res) => {
-  try {
-    var ver_code = req.query.id
+// /**
+//  * API Endpoint to verify email address
+//  */
+// router.get("/verify_email", async(req, res) => {
+//   try {
+//     var ver_code = req.query.id
 
-    // Get user details
-    const response = await userController.getOneUserCode(ver_code)
-    if(response.length==1)
-    {
-        // Change the account state to active
-        await userController.verified_user(response[0].email)
-        res.redirect(process.env.UI_HOST + "/login/email_verified")
-    }
-    else {
-      return res.json("verification failed. Invalid link");
-    }
-  }catch (error) {
-    console.error("Error in verifying :: ", error);
-    return res.json("verification failed. " + error.message);
-  }
-})
+//     // Get user details
+//     const response = await userController.getOneUserCode(ver_code)
+//     if(response.length==1)
+//     {
+//         // Change the account state to active
+//         await userController.verified_user(response[0].email)
+//         res.redirect(process.env.UI_HOST + "/login/email_verified")
+//     }
+//     else {
+//       return res.json("verification failed. Invalid link");
+//     }
+//   }catch (error) {
+//     console.error("Error in verifying :: ", error);
+//     return res.json("verification failed. " + error.message);
+//   }
+// })
 
 module.exports = router;

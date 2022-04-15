@@ -112,13 +112,13 @@
  * @param {string} ver_code : Verification code to verify email
  * @returns : Id of the inserted document
  */
- const create = async (user_name, email, password, ver_code) => {
+ const create = async (user_name, email, password) => {
    const response = await userCollection.insertOne({
      user_name,
      email,
      password,
-     ver_code,
-     status : account_status.inactive
+     ver_code : "",
+     status : account_status.verified
    });
    return response;
  };
@@ -205,34 +205,34 @@ const reset_password = async(password, reset_code) => {
      return true;
  }
 
- /**
- * Send verification link to the user's email address to verify
- * @param {string} user_name : User name
- * @param {string} email : Email address of the user
- * @param {string} password : Password of the user
- * @param {string} protocol : 'http' or 'https'
- * @param {string} host : Server host address
- * @returns
- */
- const send_ver_link = async(user_name, email, password, protocol, host) => {
+//  /**
+//  * Send verification link to the user's email address to verify
+//  * @param {string} user_name : User name
+//  * @param {string} email : Email address of the user
+//  * @param {string} password : Password of the user
+//  * @param {string} protocol : 'http' or 'https'
+//  * @param {string} host : Server host address
+//  * @returns
+//  */
+//  const send_ver_link = async(user_name, email, password, protocol, host) => {
 
-   var ver_code = generate_code(8)
-   var link= protocol + "://" + host + "/user/verify_email/?id=" + ver_code;
-   var body = "Hello, Please Click on the link to verify your email. <a href=" + link + ">Click here to verify</a>"
-   var subject = "Email verification link"
+//    var ver_code = generate_code(8)
+//    var link= protocol + "://" + host + "/user/verify_email/?id=" + ver_code;
+//    var body = "Hello, Please Click on the link to verify your email. <a href=" + link + ">Click here to verify</a>"
+//    var subject = "Email verification link"
 
-   // Send the email to user's mail ID
-   var sent =  await send_email(email, subject, body)
-   console.log("Sent:", sent)
+//    // Send the email to user's mail ID
+//    var sent =  await send_email(email, subject, body)
+//    console.log("Sent:", sent)
 
-   // When mail is sent create a inactive account in database
-   if(sent==true) {
-     create(user_name, email, password, ver_code)
-     return true
-   }
+//    // When mail is sent create a inactive account in database
+//    if(sent==true) {
+//      create(user_name, email, password, ver_code)
+//      return true
+//    }
 
-   return sent
- }
+//    return sent
+//  }
 
  /**
 * Send link to reset password
@@ -266,22 +266,22 @@ const send_reset_link = async(email, protocol, host) => {
   return sent
 }
 
- /**
- * Change th user account from inactive to active
- * @param {string} email : Email ID of the user
- */
- const verified_user = async (email) => {
-   console.log(email, account_status.verified)
-   userCollection.updateOne({
-     email
-   },
-   {
-     $set : {
-       ver_code : "",
-       status : account_status.verified
-     }
-   })
- }
+//  /**
+//  * Change th user account from inactive to active
+//  * @param {string} email : Email ID of the user
+//  */
+//  const verified_user = async (email) => {
+//    console.log(email, account_status.verified)
+//    userCollection.updateOne({
+//      email
+//    },
+//    {
+//      $set : {
+//        ver_code : "",
+//        status : account_status.verified
+//      }
+//    })
+//  }
 
  // Export functions
  module.exports = {
@@ -289,8 +289,6 @@ const send_reset_link = async(email, protocol, host) => {
      getOneUser,
      send_reset_link,
      reset_password,
-     send_ver_link,
-     verified_user,
      getOneUserCode,
      getOneUserName,
      getOneUserId,
